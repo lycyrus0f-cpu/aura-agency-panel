@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#151022">
+<title>Aura Agency Asistan Paneli</title>
+<style>
+:root{
+  --bg:#0d0918;--panel:#19132d;--panel2:#21193a;--text:#f7f3ff;--muted:#aaa0c5;
+  --primary:#9f6cff;--primary2:#6e42d9;--success:#2ed6a1;--danger:#ff5e79;
+  --warning:#ffc857;--border:rgba(255,255,255,.09);--shadow:0 12px 34px rgba(0,0,0,.28)
+}
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);
+  background:radial-gradient(circle at top right,rgba(159,108,255,.22),transparent 35%),linear-gradient(160deg,#0d0918,#151025 55%,#0c0915)
+}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+.app{width:min(1180px,100%);margin:auto;padding:18px 16px 96px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:16px}
+.brand h1{font-size:clamp(24px,5vw,36px);margin:0;letter-spacing:-.8px}
+.brand p{margin:5px 0 0;color:var(--muted);font-size:14px}
+.clock{text-align:right;background:rgba(25,19,45,.9);border:1px solid var(--border);padding:11px 14px;border-radius:17px}
+.clock strong{display:block}.clock span{font-size:12px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:16px}
+.stat{background:rgba(25,19,45,.9);border:1px solid var(--border);border-radius:19px;padding:15px;box-shadow:var(--shadow)}
+.stat strong{font-size:23px;display:block}.stat span{font-size:12px;color:var(--muted)}
+.nav{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;padding:7px;position:sticky;top:8px;z-index:10;background:rgba(20,14,36,.88);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:20px;margin-bottom:17px}
+.nav button{border:0;border-radius:14px;padding:12px 7px;color:var(--muted);background:transparent;font-weight:800}
+.nav button.active{color:#fff;background:linear-gradient(145deg,var(--primary),var(--primary2))}
+.section{display:none}.section.active{display:block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.card{background:rgba(25,19,45,.92);border:1px solid var(--border);border-radius:22px;padding:18px;box-shadow:var(--shadow)}
+.card h2,.card h3{margin:0 0 13px}.muted{color:var(--muted)}.small{font-size:13px}
+label{display:block;margin:12px 0 7px;color:#ddd5ef;font-size:14px;font-weight:750}
+input,textarea,select{width:100%;border:1px solid var(--border);border-radius:14px;padding:13px 14px;color:var(--text);background:#120d22;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(159,108,255,.15)}
+textarea{min-height:120px;resize:vertical}.row{display:flex;gap:10px;align-items:center}.row>*{flex:1}
+.btn{border:0;border-radius:14px;padding:13px 16px;font-weight:850;color:#fff;background:linear-gradient(145deg,var(--primary),var(--primary2))}
+.btn.secondary{background:#2a2048}.btn.success{background:linear-gradient(145deg,#22b889,#178e6c)}
+.btn.danger{background:linear-gradient(145deg,#ff627f,#cf3654)}.btn.warning{background:linear-gradient(145deg,#d89b20,#9c6d0c)}
+.btn.smallbtn{padding:9px 11px;font-size:13px}
+.toolbar,.actions{display:flex;flex-wrap:wrap;gap:9px}.toolbar{margin-bottom:14px}.toolbar .search{flex:1;min-width:210px}
+.list{display:grid;gap:11px}.item{background:linear-gradient(145deg,rgba(33,25,58,.98),rgba(24,18,43,.98));border:1px solid var(--border);border-radius:18px;padding:14px}
+.item-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.item h3{margin:0;font-size:18px}
+.meta{margin-top:7px;display:flex;flex-wrap:wrap;gap:7px;color:var(--muted);font-size:13px}
+.tag{border-radius:999px;padding:5px 9px;background:rgba(159,108,255,.15);color:#d8c6ff;border:1px solid rgba(159,108,255,.22)}
+.tag.active{color:#90f2cf;background:rgba(46,214,161,.12);border-color:rgba(46,214,161,.22)}
+.tag.danger{color:#ff9aad;background:rgba(255,94,121,.12);border-color:rgba(255,94,121,.22)}
+.tag.warning{color:#ffd57a;background:rgba(255,200,87,.12);border-color:rgba(255,200,87,.22)}
+.note-text{white-space:pre-wrap;line-height:1.5;margin-top:9px}
+.empty{text-align:center;padding:32px 12px;color:var(--muted);border:1px dashed var(--border);border-radius:18px}
+.progress{height:12px;border-radius:999px;background:#100b1f;overflow:hidden;border:1px solid var(--border);margin-top:10px}
+.progress span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--primary),var(--success))}
+.check-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--border);border-radius:17px;background:#120d22;margin-top:10px}
+.check-card input{width:24px;height:24px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px}
+.mini-kpi{background:#120d22;border:1px solid var(--border);border-radius:16px;padding:13px}
+.mini-kpi strong{display:block;font-size:20px}.mini-kpi span{font-size:12px;color:var(--muted)}
+.alert{border-radius:17px;padding:14px;margin:12px 0;border:1px solid}
+.alert.success{background:rgba(46,214,161,.09);border-color:rgba(46,214,161,.25)}
+.alert.danger{background:rgba(255,94,121,.09);border-color:rgba(255,94,121,.25)}
+.alert.warning{background:rgba(255,200,87,.08);border-color:rgba(255,200,87,.24)}
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:17px;background:rgba(5,3,10,.72);backdrop-filter:blur(7px);z-index:30}
+.modal.show{display:flex}.modal-box{width:min(600px,100%);max-height:90vh;overflow:auto;background:#171129;border:1px solid var(--border);border-radius:23px;padding:20px}
+.modal-title{display:flex;align-items:center;justify-content:space-between;gap:10px}.close{width:38px;height:38px;border:0;border-radius:12px;background:#2a2048;color:#fff;font-size:20px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120px);background:#f6f2ff;color:#1b1330;padding:12px 16px;border-radius:14px;font-weight:850;opacity:0;transition:.25s;z-index:99}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.file-chip{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--border);border-radius:14px;background:#120d22}
+@media(max-width:760px){
+  .grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .nav button{font-size:10px;padding:11px 3px}.topbar{align-items:flex-start}
+}
+@media(max-width:430px){
+  .app{padding-left:11px;padding-right:11px}.brand h1{font-size:24px}.clock{padding:9px}.row{flex-direction:column;align-items:stretch}
+}
+</style>
+<script async src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+ <div class="brand"><h1>Aura Agency Asistan Paneli</h1><p>Haftalık yayıncı, reklam, kota, kazanç ve belge takibi.</p></div>
+ <div class="clock"><strong id="liveTime">--:--:--</strong><span id="liveDate">--</span></div>
+</header>
+
+<section class="stats">
+ <div class="stat"><strong id="weekHostCount">0</strong><span>Bu hafta getirilen yayıncı</span></div>
+ <div class="stat"><strong id="weekQuota">0</strong><span>Bu hafta toplam kota</span></div>
+ <div class="stat"><strong id="weekUsd">0 USD</strong><span>Toplam kazanç</span></div>
+ <div class="stat"><strong id="penaltyStatus">0 AZN</strong><span>Ceza durumu</span></div>
+</section>
+
+<nav class="nav">
+ <button class="active" data-tab="home">Ana Sayfa</button>
+ <button data-tab="hosts">Yayıncılar</button>
+ <button data-tab="calculator">Kota Hesapla</button>
+ <button data-tab="notes">Notlar</button>
+ <button data-tab="documents">Belgeler</button>
+ <button data-tab="report">Rapor</button>
+ <button data-tab="settings">Ayarlar</button>
+</nav>
+
+<main>
+<section id="home" class="section active">
+ <div class="grid">
+  <div class="card">
+   <h2>Haftalık Kota Hedefi</h2>
+   <p class="muted small" id="weekRange"></p>
+   <p class="small" style="margin-bottom:5px">Minimum hedef: <b id="minimumTargetText">0 / 40.000.000</b></p>
+   <div class="progress"><span id="minimumProgress" style="width:0%"></span></div>
+   <p class="small" style="margin:13px 0 5px">Maksimum hedef: <b id="maximumTargetText">0 / 100.000.000</b></p>
+   <div class="progress"><span id="maximumProgress" style="width:0%"></span></div>
+   <div id="targetMessage" class="alert warning"></div>
+   <button class="btn" onclick="switchTab('calculator')">Kota Hesaplamaya Git</button>
+  </div>
+
+  <div class="card">
+   <h2>Reklam Görevi</h2>
+   <p class="muted small">Her hafta en az 2 kere reklam yapılmalıdır.</p>
+   <div class="check-card">
+    <div><strong>1. Reklam</strong><div class="muted small" id="ad1Time">Henüz yapılmadı</div></div>
+    <input type="checkbox" id="ad1" onchange="toggleAd(1)">
+   </div>
+   <div class="check-card">
+    <div><strong>2. Reklam</strong><div class="muted small" id="ad2Time">Henüz yapılmadı</div></div>
+    <input type="checkbox" id="ad2" onchange="toggleAd(2)">
+   </div>
+   <div id="adMessage" class="alert warning"></div>
+  </div>
+
+  <div class="card">
+   <h2>Asistan Bilgileri</h2>
+   <label>Asistan adı</label><input id="assistantName" placeholder="Adını yaz">
+   <label>Telefon numarası</label><input id="assistantPhone" placeholder="+994...">
+   <button class="btn" style="margin-top:13px" onclick="saveProfile()">Bilgileri Kaydet</button>
+  </div>
+
+  <div class="card">
+   <h2>Hafta Sonu Teslimi</h2>
+   <p class="muted">Yayıncılar, toplam kota, USD kazancı, reklam kayıtları ve belgeler haftalık rapora otomatik eklenir.</p>
+   <div class="actions">
+    <button class="btn success" onclick="generatePrintableReport()">PDF Rapor Hazırla</button>
+    <button class="btn secondary" onclick="downloadLongReportImage()">Uzun Fotoğraf İndir</button>
+    <button class="btn secondary" onclick="exportCSV()">Excel/CSV İndir</button>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section id="hosts" class="section">
+ <div class="card">
+  <div class="toolbar">
+   <input class="search" id="hostSearch" placeholder="İsim, ID veya numara ara..." oninput="renderHosts()">
+   <button class="btn secondary" onclick="calculateQuotaFromHostCards()">Kart Kotalarını Hesapla</button>
+   <button class="btn" onclick="openHostModal()">+ Yayıncı Ekle</button>
+  </div>
+  <div id="hostCardCalculation" class="alert warning">Kartlardaki kotalar henüz hesaplanmadı.</div>
+  <div id="hostList" class="list"></div>
+ </div>
+</section>
+
+<section id="calculator" class="section">
+ <div class="grid">
+  <div class="card">
+   <h2>Toplu Kota Hesaplama</h2>
+   <p class="muted small">Haftalık toplam kota ve USD yalnızca bu bölümden hesaplanır. Yayıncı kayıtlarındaki kota alanı üst panele eklenmez.</p>
+   <label>Yayıncı kotaları</label>
+   <textarea id="quotaInput" style="min-height:280px" placeholder="Örnek:
+3.200.000
+2.800.000
+1.950.000
+4.100.000"></textarea>
+   <div class="actions" style="margin-top:12px">
+    <button class="btn" onclick="calculateBulkQuota()">Kotaları Hesapla</button>
+    <button class="btn secondary" onclick="clearQuotaCalculator()">Temizle</button>
+   </div>
+  </div>
+
+  <div class="card">
+   <h2>Hesaplama Sonucu</h2>
+   <div class="kpi-grid">
+    <div class="mini-kpi"><strong id="calcCount">0</strong><span>Girilen yayıncı</span></div>
+    <div class="mini-kpi"><strong id="calcTotalQuota">0</strong><span>Toplam kota</span></div>
+    <div class="mini-kpi"><strong id="calcTotalUsd">0 USD</strong><span>Toplam kazanç</span></div>
+    <div class="mini-kpi"><strong id="calcPercent">0%</strong><span>100M hedef yüzdesi</span></div>
+   </div>
+   <div id="calcStatus" class="alert warning">Henüz hesaplama yapılmadı.</div>
+   <div class="actions">
+    <button class="btn success" onclick="saveCalculationToWeek()">Haftalık Rapora Kaydet</button>
+    <button class="btn secondary" onclick="copyCalculation()">Sonucu Kopyala</button>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section id="notes" class="section">
+ <div class="card">
+  <div class="toolbar">
+   <input class="search" id="noteSearch" placeholder="Notlarda ara..." oninput="renderNotes()">
+   <button class="btn" onclick="openNoteModal()">+ Not Ekle</button>
+  </div>
+  <div id="noteList" class="list"></div>
+ </div>
+</section>
+
+<section id="documents" class="section">
+ <div class="grid">
+  <div class="card">
+   <h2>Belge Yükle</h2>
+   <p class="muted small">Ekran görüntüsü, PDF, Excel veya diğer kanıt belgelerini ekle.</p>
+   <label>Belge açıklaması</label><input id="docDescription" placeholder="Örn: 1. reklam ekran görüntüsü">
+   <label>Dosya seç</label><input id="docFile" type="file" accept=".pdf,.xlsx,.xls,.csv,.jpg,.jpeg,.png,.doc,.docx">
+   <button class="btn" style="margin-top:13px" onclick="addDocument()">Belgeyi Listeye Ekle</button>
+   <p class="muted small">Dosyanın kendisi cihazda kalır; raporda dosya adı, açıklama ve tarih görünür.</p>
+  </div>
+  <div class="card"><h2>Bu Haftanın Belgeleri</h2><div id="documentList" class="list"></div></div>
+ </div>
+</section>
+
+<section id="report" class="section">
+ <div class="card">
+  <h2>Haftalık Sonuç</h2>
+  <p class="muted small" id="reportRange"></p>
+  <div class="kpi-grid">
+   <div class="mini-kpi"><strong id="rHosts">0</strong><span>Yayıncı</span></div>
+   <div class="mini-kpi"><strong id="rQuota">0</strong><span>Toplam kota</span></div>
+   <div class="mini-kpi"><strong id="rUsd">0 USD</strong><span>Toplam kazanç</span></div>
+   <div class="mini-kpi"><strong id="rPenalty">0 AZN</strong><span>Ceza</span></div>
+  </div>
+  <div id="finalResult" class="alert warning"></div>
+  <div class="actions">
+   <button class="btn success" onclick="generatePrintableReport()">PDF Rapor Hazırla</button>
+   <button class="btn secondary" onclick="downloadLongReportImage()">Uzun Fotoğraf İndir</button>
+   <button class="btn secondary" onclick="exportCSV()">Excel/CSV İndir</button>
+   <button class="btn secondary" onclick="shareSummary()">Özeti Paylaş</button>
+  </div>
+ </div>
+</section>
+
+<section id="settings" class="section">
+ <div class="grid">
+  <div class="card">
+   <h2>Bilgileri Değiştir</h2>
+   <p class="muted small">Asistan adı ve telefon numarasını buradan güncelleyebilirsin.</p>
+   <label>Asistan adı</label>
+   <input id="settingsAssistantName" placeholder="Asistan adı">
+   <label>Telefon numarası</label>
+   <input id="settingsAssistantPhone" placeholder="+994...">
+   <button class="btn" style="margin-top:13px" onclick="saveSettingsProfile()">Bilgileri Güncelle</button>
+  </div>
+
+  <div class="card">
+   <h2>Haftalık Raporu Sil</h2>
+   <p class="muted small">Bu haftaya kaydedilen toplu kota hesabını, reklam işaretlerini ve belge listesini temizler. Yayıncı kayıtları silinmez.</p>
+   <button class="btn warning" onclick="deleteCurrentWeekReport()">Bu Haftanın Raporunu Sil</button>
+  </div>
+
+  
+  <div class="card">
+   <h2>Haftalık Döngüyü Sıfırla</h2>
+   <p class="muted small">Mevcut döngünün raporu arşive kaydedilir. Ardından yeni dönem; 0 kota, 0 yayıncı, 0 reklam ve boş belge listesiyle başlar. Panel kendiliğinden yenilenmez.</p>
+   <button class="btn success" onclick="resetWeeklyCycle()">Eski Raporu Kaydet ve Yeni Haftayı Başlat</button>
+  </div>
+
+  <div class="card">
+   <h2>Eski Rapor Arşivi</h2>
+   <p class="muted small">Kapatılan haftalık döngülerin özetlerini buradan görüntüleyebilir ve PDF olarak açabilirsin.</p>
+   <div id="archiveList" class="list"></div>
+  </div>
+
+  <div class="card" style="border-color:rgba(255,94,121,.25);background:rgba(255,94,121,.06)">
+   <h2>Tümünü Sıfırla</h2>
+   <p class="muted small">Tüm yayıncılar, notlar, belgeler, reklam kayıtları, kota hesapları ve asistan bilgileri kalıcı olarak silinir.</p>
+   <button class="btn danger" onclick="resetAllData()">Tüm Verileri Sıfırla</button>
+  </div>
+ </div>
+</section>
+
+</main>
+</div>
+
+<div class="modal" id="hostModal"><div class="modal-box">
+ <div class="modal-title"><h2 id="hostModalTitle">Yayıncı Ekle</h2><button class="close" onclick="closeModal('hostModal')">×</button></div>
+ <input type="hidden" id="hostEditId">
+ <label>Yayıncı adı *</label><input id="hostName">
+ <label>SOYO ID *</label><input id="hostId" inputmode="numeric">
+ <label>Telefon numarası *</label><input id="hostPhone" inputmode="tel">
+ <div class="row">
+  <div><label>Yayıncı kotası (bilgi amaçlı)</label><input id="hostQuota" type="number" min="0"></div>
+  <div><label>Durum</label><select id="hostStatus"><option>Aktif</option><option>Beklemede</option><option>Pasif</option></select></div>
+ </div>
+ <label>Kayıt tarihi</label><input id="hostDate" type="date">
+ <label>Ek not</label><textarea id="hostNote"></textarea>
+ <button class="btn" style="width:100%;margin-top:13px" onclick="saveHost()">Kaydet</button>
+</div></div>
+
+<div class="modal" id="noteModal"><div class="modal-box">
+ <div class="modal-title"><h2>Yeni Not</h2><button class="close" onclick="closeModal('noteModal')">×</button></div>
+ <input type="hidden" id="noteEditId">
+ <label>Başlık *</label><input id="noteTitle">
+ <label>Not *</label><textarea id="noteContent"></textarea>
+ <button class="btn" style="width:100%;margin-top:13px" onclick="saveNote()">Notu Kaydet</button>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY="auraAssistantPanel_final_v1";
+let data=loadData();
+
+function defaultData(){return{profile:{name:"",phone:""},hosts:[],notes:[],documents:[],ads:{},calculations:{},cycle:{id:"cycle-1",number:1,startedAt:Date.now()},archives:[]}}
+function loadData(){
+ try{
+  const parsed=JSON.parse(localStorage.getItem(KEY));
+  return parsed?{...defaultData(),...parsed}:defaultData()
+ }catch(e){return defaultData()}
+}
+function persist(){localStorage.setItem(KEY,JSON.stringify(data));updateUI()}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function today(){return new Date().toISOString().slice(0,10)}
+function esc(t=""){return String(t).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function num(v){return new Intl.NumberFormat("tr-TR").format(Number(v||0))}
+function fmtDate(v){return v?new Date(v+"T00:00:00").toLocaleDateString("tr-TR"):"-"}
+function fmtDateTime(v){return v?new Date(v).toLocaleString("tr-TR"):"-"}
+function usd(v){return Number(v||0).toLocaleString("tr-TR",{minimumFractionDigits:2,maximumFractionDigits:2})+" USD"}
+
+function cycleInfo(){
+ if(!data.cycle){
+   data.cycle={id:"cycle-1",number:1,startedAt:Date.now()};
+ }
+ const start=new Date(data.cycle.startedAt);
+ return{
+   start,
+   key:data.cycle.id,
+   number:data.cycle.number||1,
+   label:`${data.cycle.number||1}. Hafta Döngüsü • Başlangıç: ${start.toLocaleString("tr-TR")}`
+ }
+}
+function weekInfo(){return cycleInfo()}
+function currentWeekHosts(){const w=cycleInfo();return data.hosts.filter(h=>(h.cycleId||"cycle-1")===w.key)}
+function currentWeekDocs(){const w=cycleInfo();return data.documents.filter(d=>(d.cycleId||"cycle-1")===w.key)}
+function currentCalculation(){return data.calculations?.[cycleInfo().key]||null}
+
+function showToast(m){const e=document.getElementById("toast");e.textContent=m;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2100)}
+function switchTab(id){document.querySelectorAll(".section").forEach(s=>s.classList.toggle("active",s.id===id));document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));window.scrollTo({top:0,behavior:"smooth"})}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+function closeModal(id){document.getElementById(id).classList.remove("show")}
+window.addEventListener("click",e=>{if(e.target.classList.contains("modal"))e.target.classList.remove("show")})
+
+function openHostModal(h=null){
+ document.getElementById("hostModalTitle").textContent=h?"Yayıncıyı Düzenle":"Yayıncı Ekle";
+ document.getElementById("hostEditId").value=h?.key||"";
+ document.getElementById("hostName").value=h?.name||"";
+ document.getElementById("hostId").value=h?.soyoId||"";
+ document.getElementById("hostPhone").value=h?.phone||"";
+ document.getElementById("hostQuota").value=h?.quota||"";
+ document.getElementById("hostStatus").value=h?.status||"Aktif";
+ document.getElementById("hostDate").value=h?.date||today();
+ document.getElementById("hostNote").value=h?.note||"";
+ document.getElementById("hostModal").classList.add("show")
+}
+function saveHost(){
+ const key=document.getElementById("hostEditId").value;
+ const name=document.getElementById("hostName").value.trim(),soyoId=document.getElementById("hostId").value.trim(),phone=document.getElementById("hostPhone").value.trim();
+ if(!name||!soyoId||!phone){showToast("İsim, ID ve telefon zorunludur.");return}
+ if(data.hosts.some(h=>h.soyoId===soyoId&&h.key!==key)){showToast("Bu SOYO ID zaten kayıtlı.");return}
+ const obj={name,soyoId,phone,quota:Number(document.getElementById("hostQuota").value||0),status:document.getElementById("hostStatus").value,date:document.getElementById("hostDate").value||today(),note:document.getElementById("hostNote").value.trim()};
+ if(key){const i=data.hosts.findIndex(h=>h.key===key);data.hosts[i]={...data.hosts[i],...obj,updatedAt:Date.now()}}
+ else data.hosts.unshift({key:uid(),cycleId:cycleInfo().key,...obj,createdAt:Date.now()});
+ closeModal("hostModal");persist();showToast("Yayıncı kaydedildi.")
+}
+
+function openWhatsApp(phone,business){
+ let p=String(phone||"").replace(/\D/g,"");
+ if(!p){showToast("Telefon numarası yok.");return;}
+
+ const appUrl=(business?"whatsapp-business://send?phone=":"whatsapp://send?phone=")+p;
+ const fallback="https://wa.me/"+p;
+ let hidden=false;
+
+ const onHide=()=>{hidden=true;document.removeEventListener("visibilitychange",onHide)};
+ document.addEventListener("visibilitychange",onHide);
+ window.location.href=appUrl;
+
+ setTimeout(()=>{
+   document.removeEventListener("visibilitychange",onHide);
+   if(!hidden) window.location.href=fallback;
+ },1200);
+}
+
+function editHost(k){const h=data.hosts.find(x=>x.key===k);if(h)openHostModal(h)}
+function deleteHost(k){if(confirm("Bu yayıncı silinsin mi?")){data.hosts=data.hosts.filter(h=>h.key!==k);persist()}}
+function hostCard(h){return`<div class="item"><div class="item-head"><div><h3>${esc(h.name)}</h3><div class="meta"><span class="tag">ID: ${esc(h.soyoId)}</span><span class="tag active">${esc(h.status)}</span><span class="tag">${fmtDate(h.date)}</span></div></div></div>
+ <div class="meta"><span>Telefon: ${esc(h.phone)}</span><span>Kota: ${num(h.quota)}</span></div>
+ ${h.note?`<div class="note-text">${esc(h.note)}</div>`:""}<div class="actions" style="margin-top:11px">
+<button class="btn smallbtn" style="background:#25D366;color:#fff" onclick="openWhatsApp('${h.phone}',false)">💬 WhatsApp</button>
+<button class="btn smallbtn" style="background:#128C7E;color:#fff" onclick="openWhatsApp('${h.phone}',true)">💼 WA Business</button>
+<button class="btn smallbtn secondary" onclick="editHost('${h.key}')">Düzenle</button>
+<button class="btn smallbtn danger" onclick="deleteHost('${h.key}')">Sil</button>
+</div></div>`}
+function renderHosts(){const q=(document.getElementById("hostSearch").value||"").toLowerCase();const list=data.hosts.filter(h=>(h.name+" "+h.soyoId+" "+h.phone).toLowerCase().includes(q));document.getElementById("hostList").innerHTML=list.length?list.map(hostCard).join(""):`<div class="empty">Yayıncı kaydı yok.</div>`}
+
+
+function calculateQuotaFromHostCards(){
+ const hosts=currentWeekHosts();
+ const valid=hosts.filter(h=>Number(h.quota||0)>0);
+ const total=valid.reduce((sum,h)=>sum+Number(h.quota||0),0);
+ const result=document.getElementById("hostCardCalculation");
+
+ if(!valid.length){
+   result.className="alert danger";
+   result.textContent="Bu haftaki yayıncı kartlarında hesaplanacak kota bulunamadı.";
+   showToast("Yayıncı kartlarına kota yazmalısın.");
+   return;
+ }
+
+ const totalUsd=total/22000;
+ const w=weekInfo();
+ data.calculations=data.calculations||{};
+ data.calculations[w.key]={
+   values:valid.map(h=>Number(h.quota||0)),
+   total,
+   usd:totalUsd,
+   savedAt:Date.now(),
+   source:"host_cards"
+ };
+ localStorage.setItem(KEY,JSON.stringify(data));
+ updateUI();
+
+ result.className="alert "+(total>=100000000?"success":total>=40000000?"warning":"danger");
+ result.innerHTML=`<b>${valid.length} yayıncı kartı hesaplandı.</b><br>
+ Toplam kota: <b>${num(total)} 💎</b><br>
+ Toplam kazanç: <b>${usd(totalUsd)}</b><br>
+ Sonuç haftalık rapora kaydedildi.`;
+
+ showToast("Kart kotaları hesaplandı ve rapora kaydedildi.");
+}
+
+function parseQuotaLine(line){
+ const raw=String(line||"").trim();
+ if(!raw)return 0;
+ let cleaned=raw.replace(/\s/g,"").replace(/[^\d.,-]/g,"");
+ const dots=(cleaned.match(/\./g)||[]).length,commas=(cleaned.match(/,/g)||[]).length;
+ if(dots>1&&commas===0)cleaned=cleaned.replace(/\./g,"");
+ else if(commas>1&&dots===0)cleaned=cleaned.replace(/,/g,"");
+ else if(dots&&commas){
+  const ld=cleaned.lastIndexOf("."),lc=cleaned.lastIndexOf(",");
+  cleaned=ld>lc?cleaned.replace(/,/g,""):cleaned.replace(/\./g,"").replace(",",".")
+ }else if(commas===1&&dots===0){
+  const p=cleaned.split(",");cleaned=p[1]?.length===3?cleaned.replace(",",""):cleaned.replace(",",".")
+ }else if(dots===1&&commas===0){
+  const p=cleaned.split(".");if(p[1]?.length===3)cleaned=cleaned.replace(".","")
+ }
+ const n=Number(cleaned);return Number.isFinite(n)?n:0
+}
+function getBulkCalculation(){
+ const values=(document.getElementById("quotaInput").value||"").split(/\r?\n/).map(parseQuotaLine).filter(v=>v>0);
+ const total=values.reduce((a,b)=>a+b,0);
+ return{values,total,usd:total/22000}
+}
+function calculateBulkQuota(){
+ const r=getBulkCalculation();
+ document.getElementById("calcCount").textContent=r.values.length;
+ document.getElementById("calcTotalQuota").textContent=num(r.total);
+ document.getElementById("calcTotalUsd").textContent=usd(r.usd);
+ document.getElementById("calcPercent").textContent=Math.min(100,r.total/100000000*100).toFixed(1)+"%";
+ const status=document.getElementById("calcStatus");
+ if(!r.values.length){status.className="alert danger";status.textContent="Geçerli kota bulunamadı.";return}
+ if(r.total>=100000000){status.className="alert success";status.innerHTML=`<b>ELITE:</b> Maksimum 100.000.000 kota hedefi tamamlandı. Toplam kazanç: <b>${usd(r.usd)}</b>`}
+ else if(r.total>=40000000){status.className="alert warning";status.innerHTML=`<b>Başarılı:</b> Minimum 40.000.000 hedefi tamamlandı. Maksimum hedefe <b>${num(100000000-r.total)}</b> kota kaldı.`}
+ else{status.className="alert danger";status.innerHTML=`<b>LOW:</b> Minimum hedefe <b>${num(40000000-r.total)}</b> kota kaldı. Hafta bu seviyede kapanırsa 20 AZN ceza uygulanır.`}
+}
+function clearQuotaCalculator(){
+ document.getElementById("quotaInput").value="";
+ ["calcCount","calcTotalQuota"].forEach(id=>document.getElementById(id).textContent="0");
+ document.getElementById("calcTotalUsd").textContent="0 USD";
+ document.getElementById("calcPercent").textContent="0%";
+ document.getElementById("calcStatus").className="alert warning";
+ document.getElementById("calcStatus").textContent="Henüz hesaplama yapılmadı."
+}
+function saveCalculationToWeek(){
+ const r=getBulkCalculation();if(!r.values.length){showToast("Önce kota hesaplamalısın.");return}
+ const w=weekInfo();data.calculations[w.key]={values:r.values,total:r.total,usd:r.usd,savedAt:Date.now()};persist();showToast("Hesaplama haftalık rapora kaydedildi.")
+}
+async function copyCalculation(){
+ const r=getBulkCalculation();if(!r.values.length){showToast("Önce kota hesaplamalısın.");return}
+ const text=`Aura Agency Kota Sonucu
+Yayıncı sayısı: ${r.values.length}
+Toplam kota: ${num(r.total)} 💎
+Toplam kazanç: ${usd(r.usd)}
+Oran: 22.000 💎 = 1 USD
+Minimum hedef: 40.000.000 💎
+Maksimum hedef: 100.000.000 💎`;
+ try{await navigator.clipboard.writeText(text);showToast("Sonuç kopyalandı.")}catch(e){showToast("Kopyalama başarısız.")}
+}
+
+function openNoteModal(n=null){document.getElementById("noteEditId").value=n?.key||"";document.getElementById("noteTitle").value=n?.title||"";document.getElementById("noteContent").value=n?.content||"";document.getElementById("noteModal").classList.add("show")}
+function saveNote(){const key=document.getElementById("noteEditId").value,title=document.getElementById("noteTitle").value.trim(),content=document.getElementById("noteContent").value.trim();if(!title||!content){showToast("Başlık ve not zorunludur.");return}
+ if(key){const i=data.notes.findIndex(n=>n.key===key);data.notes[i]={...data.notes[i],title,content,updatedAt:Date.now()}}else data.notes.unshift({key:uid(),cycleId:cycleInfo().key,title,content,createdAt:Date.now()});
+ closeModal("noteModal");persist();showToast("Not kaydedildi.")}
+function editNote(k){const n=data.notes.find(x=>x.key===k);if(n)openNoteModal(n)}
+function deleteNote(k){if(confirm("Not silinsin mi?")){data.notes=data.notes.filter(n=>n.key!==k);persist()}}
+function renderNotes(){const q=(document.getElementById("noteSearch").value||"").toLowerCase();const list=data.notes.filter(n=>(n.title+" "+n.content).toLowerCase().includes(q));document.getElementById("noteList").innerHTML=list.length?list.map(n=>`<div class="item"><div class="item-head"><h3>${esc(n.title)}</h3><span class="muted small">${fmtDateTime(n.createdAt)}</span></div><div class="note-text">${esc(n.content)}</div><div class="actions" style="margin-top:10px"><button class="btn smallbtn secondary" onclick="editNote('${n.key}')">Düzenle</button><button class="btn smallbtn danger" onclick="deleteNote('${n.key}')">Sil</button></div></div>`).join(""):`<div class="empty">Not kaydı yok.</div>`}
+
+function saveProfile(){data.profile.name=document.getElementById("assistantName").value.trim();data.profile.phone=document.getElementById("assistantPhone").value.trim();persist();showToast("Bilgiler kaydedildi.")}
+function toggleAd(n){const w=weekInfo();data.ads[w.key]=data.ads[w.key]||{};const checked=document.getElementById("ad"+n).checked;data.ads[w.key]["ad"+n]=checked?Date.now():null;persist();showToast(checked?"Reklam tamamlandı.":"Reklam işareti kaldırıldı.")}
+function addDocument(){const file=document.getElementById("docFile").files[0],desc=document.getElementById("docDescription").value.trim();if(!file){showToast("Dosya seçmelisin.");return}
+ data.documents.unshift({key:uid(),cycleId:cycleInfo().key,name:file.name,size:file.size,type:file.type||"Bilinmiyor",description:desc,createdAt:Date.now()});
+ document.getElementById("docFile").value="";document.getElementById("docDescription").value="";persist();showToast("Belge rapor listesine eklendi.")}
+function deleteDocument(k){data.documents=data.documents.filter(d=>d.key!==k);persist()}
+function renderDocuments(){const docs=currentWeekDocs();document.getElementById("documentList").innerHTML=docs.length?docs.map(d=>`<div class="file-chip"><div><strong>${esc(d.name)}</strong><div class="muted small">${esc(d.description||"Açıklama yok")} • ${fmtDateTime(d.createdAt)}</div></div><button class="btn smallbtn danger" onclick="deleteDocument('${d.key}')">Sil</button></div>`).join(""):`<div class="empty">Bu hafta belge eklenmedi.</div>`}
+
+function calculate(){
+ const w=weekInfo(),hosts=currentWeekHosts(),count=hosts.length;
+ const saved=currentCalculation();
+ const quota=saved?.total||0;
+ const totalUsd=saved?.usd||0;
+ const minimumReached=quota>=40000000,maximumReached=quota>=100000000,penalty=!saved?0:(minimumReached?0:20);
+ const ads=data.ads[w.key]||{},adCount=(ads.ad1?1:0)+(ads.ad2?1:0);
+ return{w,hosts,count,quota,totalUsd,minimumReached,maximumReached,penalty,ads,adCount,saved}
+}
+
+function updateDashboard(){
+ const r=calculate();
+ document.getElementById("weekHostCount").textContent=r.count;
+ document.getElementById("weekQuota").textContent=num(r.quota);
+ document.getElementById("weekUsd").textContent=usd(r.totalUsd);
+ document.getElementById("penaltyStatus").textContent=r.penalty+" AZN";
+ document.getElementById("weekRange").textContent=r.w.label;
+ document.getElementById("reportRange").textContent=r.w.label;
+ document.getElementById("minimumTargetText").textContent=`${num(r.quota)} / 40.000.000`;
+ document.getElementById("maximumTargetText").textContent=`${num(r.quota)} / 100.000.000`;
+ document.getElementById("minimumProgress").style.width=Math.min(100,r.quota/40000000*100)+"%";
+ document.getElementById("maximumProgress").style.width=Math.min(100,r.quota/100000000*100)+"%";
+
+ const tm=document.getElementById("targetMessage");
+ tm.className="alert "+(r.maximumReached?"success":r.minimumReached?"warning":"danger");
+ tm.innerHTML=!r.saved
+ ? `<b>Henüz haftalık kota kaydedilmedi.</b> Kota Hesapla bölümünden kotaları hesaplayıp “Haftalık Rapora Kaydet” butonuna bas.`
+ : r.maximumReached
+ ? `<b>ELITE:</b> 100.000.000 kota maksimum hedefi tamamlandı.`
+ : r.minimumReached
+ ? `<b>Başarılı:</b> Minimum 40.000.000 hedefi tamamlandı. Maksimum hedefe ${num(100000000-r.quota)} kota kaldı.`
+ : `<b>Başarısız:</b> Minimum hedefe ${num(40000000-r.quota)} kota kaldı. Hafta bu seviyede kapanırsa 20 AZN ceza uygulanır.`;
+
+ document.getElementById("ad1").checked=!!r.ads.ad1;document.getElementById("ad2").checked=!!r.ads.ad2;
+ document.getElementById("ad1Time").textContent=r.ads.ad1?fmtDateTime(r.ads.ad1):"Henüz yapılmadı";
+ document.getElementById("ad2Time").textContent=r.ads.ad2?fmtDateTime(r.ads.ad2):"Henüz yapılmadı";
+ const am=document.getElementById("adMessage");am.className="alert "+(r.adCount>=2?"success":"warning");am.textContent=r.adCount>=2?"Bu haftanın 2 reklam görevi tamamlandı.":`Bu hafta ${r.adCount}/2 reklam tamamlandı.`;
+
+ document.getElementById("rHosts").textContent=r.count;document.getElementById("rQuota").textContent=num(r.quota);document.getElementById("rUsd").textContent=usd(r.totalUsd);document.getElementById("rPenalty").textContent=r.penalty+" AZN";
+ const fr=document.getElementById("finalResult");fr.className="alert "+(r.minimumReached&&r.adCount>=2?"success":"danger");
+ fr.innerHTML=r.minimumReached&&r.adCount>=2
+ ? `Haftalık görev başarılı. Kota: ${num(r.quota)} 💎 • Kazanç: ${usd(r.totalUsd)} • Reklam: ${r.adCount}/2`
+ : `Eksik görev var. Kota: ${num(r.quota)} / 40.000.000 • Reklam: ${r.adCount}/2 • Ceza: ${r.penalty} AZN`;
+}
+
+function reportHtml(){
+ const r=calculate(),docs=currentWeekDocs(),name=data.profile.name||"Belirtilmedi",phone=data.profile.phone||"Belirtilmedi";
+ const rows=r.hosts.map((h,i)=>`<tr><td>${i+1}</td><td>${esc(h.name)}</td><td>${esc(h.soyoId)}</td><td>${esc(h.phone)}</td><td>${num(h.quota)}</td><td>${esc(h.status)}</td></tr>`).join("")||'<tr><td colspan="6">Yayıncı kaydı yok.</td></tr>';
+ const docRows=docs.map((d,i)=>`<tr><td>${i+1}</td><td>${esc(d.name)}</td><td>${esc(d.description||"-")}</td><td>${fmtDateTime(d.createdAt)}</td></tr>`).join("")||'<tr><td colspan="4">Belge kaydı yok.</td></tr>';
+ return `<!doctype html><html><head><meta charset="utf-8"><title>Aura Agency Haftalık Rapor</title><style>
+ body{font-family:Arial,sans-serif;color:#222;padding:28px}h1{margin-bottom:4px}.sub{color:#666;margin-bottom:22px}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}.box{border:1px solid #ddd;border-radius:10px;padding:12px}.box b{display:block;font-size:21px}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border:1px solid #ddd;padding:8px;font-size:12px;text-align:left}th{background:#f1edff}.result{padding:12px;border:1px solid ${r.penalty?'#d33':'#2a7'};border-radius:10px;margin:15px 0}.footer{margin-top:25px;color:#777;font-size:11px}</style>
+</head><body>
+ <h1>Aura Agency - Haftalık Asistan Raporu</h1><div class="sub">${r.w.label} • Rapor zamanı: ${new Date().toLocaleString("tr-TR")}</div>
+ <p><b>Asistan:</b> ${esc(name)} &nbsp; <b>Telefon:</b> ${esc(phone)}</p>
+ <div class="summary"><div class="box"><b>${r.count}</b>Yayıncı</div><div class="box"><b>${num(r.quota)}</b>Toplam kota</div><div class="box"><b>${usd(r.totalUsd)}</b>22.000 💎 = 1 USD</div><div class="box"><b>${r.penalty} AZN</b>Ceza</div></div>
+ <div class="result"><b>Haftalık sonuç:</b> Minimum 40.000.000 • Maksimum 100.000.000 • Mevcut ${num(r.quota)} • Reklam ${r.adCount}/2 • ${r.penalty?'<b>20 AZN ceza uygulanır.</b>':'Minimum hedef tamamlandı.'}</div>
+ <h2>Yayıncı Listesi</h2><table><thead><tr><th>#</th><th>İsim</th><th>SOYO ID</th><th>Telefon</th><th>Kota</th><th>Durum</th></tr></thead><tbody>${rows}</tbody></table>
+ <h2>Reklam Kayıtları</h2><p>1. Reklam: ${r.ads.ad1?fmtDateTime(r.ads.ad1):"Yapılmadı"}<br>2. Reklam: ${r.ads.ad2?fmtDateTime(r.ads.ad2):"Yapılmadı"}</p>
+ <h2>Eklenen Belgeler</h2><table><thead><tr><th>#</th><th>Dosya</th><th>Açıklama</th><th>Tarih</th></tr></thead><tbody>${docRows}</tbody></table>
+ <div class="footer">Bu rapor Aura Agency Asistan Paneli tarafından hazırlanmıştır.</div>
+ <script>window.onload=()=>setTimeout(()=>window.print(),300)<\/script></body></html>`;
+}
+function generatePrintableReport(){const w=window.open("","_blank");if(!w){showToast("Açılır pencereye izin ver.");return}w.document.open();w.document.write(reportHtml());w.document.close()}
+function exportCSV(){
+ const r=calculate();
+ const rows=[["Aura Agency Haftalık Rapor"],["Dönem",r.w.label],["Asistan",data.profile.name||""],["Yayıncı Sayısı",r.count],["Toplam Kota",r.quota],["Toplam Kazanç USD",r.totalUsd.toFixed(2)],["Minimum Hedef","40.000.000"],["Maksimum Hedef","100.000.000"],["Reklam",r.adCount+"/2"],["Ceza",r.penalty+" AZN"],[],["İsim","SOYO ID","Telefon","Kota","Durum","Kayıt Tarihi"]];
+ r.hosts.forEach(h=>rows.push([h.name,h.soyoId,h.phone,h.quota||0,h.status,h.date]));
+ const csv="\uFEFF"+rows.map(x=>x.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(";")).join("\n");
+ const b=new Blob([csv],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=`Aura-Agency-Haftalik-Rapor-${r.w.key}.csv`;a.click();URL.revokeObjectURL(a.href)
+}
+async function shareSummary(){
+ const r=calculate();
+ const t=`Aura Agency Haftalık Asistan Raporu
+Dönem: ${r.w.label}
+Asistan: ${data.profile.name||"-"}
+Yayıncı: ${r.count}
+Toplam kota: ${num(r.quota)}
+Toplam kazanç: ${usd(r.totalUsd)}
+Minimum hedef: 40.000.000
+Maksimum hedef: 100.000.000
+Reklam: ${r.adCount}/2
+Ceza: ${r.penalty} AZN`;
+ try{if(navigator.share)await navigator.share({title:"Aura Agency Haftalık Rapor",text:t});else{await navigator.clipboard.writeText(t);showToast("Özet kopyalandı.")}}catch(e){}
+}
+
+
+function buildArchiveSnapshot(){
+ const r=calculate();
+ return{
+   key:uid(),
+   cycleId:r.w.key,
+   cycleNumber:r.w.number,
+   startedAt:r.w.start.getTime(),
+   closedAt:Date.now(),
+   assistantName:data.profile.name||"",
+   assistantPhone:data.profile.phone||"",
+   hostCount:r.count,
+   quota:r.quota,
+   totalUsd:r.totalUsd,
+   penalty:r.penalty,
+   adCount:r.adCount,
+   ads:{...r.ads},
+   hosts:r.hosts.map(h=>({...h})),
+   documents:currentWeekDocs().map(d=>({...d}))
+ };
+}
+
+function resetWeeklyCycle(){
+ const r=calculate();
+ const hasData=r.hosts.length||r.quota||r.adCount||currentWeekDocs().length;
+ if(!hasData){
+   if(!confirm("Bu döngüde kayıt yok. Yine de yeni haftayı başlatmak istiyor musun?"))return;
+ }else{
+   if(!confirm("Mevcut haftalık rapor arşive kaydedilecek ve yeni döngü sıfırdan başlayacak. Devam edilsin mi?"))return;
+ }
+
+ data.archives=data.archives||[];
+ data.archives.unshift(buildArchiveSnapshot());
+
+ const nextNumber=(data.cycle?.number||1)+1;
+ data.cycle={
+   id:"cycle-"+Date.now(),
+   number:nextNumber,
+   startedAt:Date.now()
+ };
+
+ localStorage.setItem(KEY,JSON.stringify(data));
+ clearQuotaCalculator();
+ updateUI();
+ switchTab("home");
+ showToast("Eski rapor kaydedildi. Yeni haftalık döngü başladı.");
+}
+
+function renderArchives(){
+ const el=document.getElementById("archiveList");
+ if(!el)return;
+ const archives=data.archives||[];
+ el.innerHTML=archives.length?archives.map(a=>`
+  <div class="item">
+   <div class="item-head">
+    <div>
+     <h3>${a.cycleNumber}. Hafta Döngüsü</h3>
+     <div class="meta">
+      <span class="tag">${new Date(a.startedAt).toLocaleString("tr-TR")}</span>
+      <span class="tag">${new Date(a.closedAt).toLocaleString("tr-TR")}</span>
+     </div>
+    </div>
+   </div>
+   <div class="meta">
+    <span>Yayıncı: ${a.hostCount}</span>
+    <span>Kota: ${num(a.quota)}</span>
+    <span>Kazanç: ${usd(a.totalUsd)}</span>
+    <span>Reklam: ${a.adCount}/2</span>
+    <span>Ceza: ${a.penalty} AZN</span>
+   </div>
+   <div class="actions" style="margin-top:10px">
+    <button class="btn smallbtn secondary" onclick="openArchiveReport('${a.key}')">PDF Raporu Aç</button>
+    <button class="btn smallbtn danger" onclick="deleteArchive('${a.key}')">Arşivden Sil</button>
+   </div>
+  </div>`).join(""):`<div class="empty">Henüz kapatılmış haftalık rapor yok.</div>`;
+}
+
+function archiveReportHtml(a){
+ const rows=(a.hosts||[]).map((h,i)=>`<tr><td>${i+1}</td><td>${esc(h.name)}</td><td>${esc(h.soyoId)}</td><td>${esc(h.phone)}</td><td>${num(h.quota)}</td><td>${esc(h.status)}</td></tr>`).join("")||'<tr><td colspan="6">Yayıncı kaydı yok.</td></tr>';
+ return `<!doctype html><html><head><meta charset="utf-8"><title>Aura Agency Arşiv Raporu</title><style>
+ body{font-family:Arial,sans-serif;color:#222;padding:28px}h1{margin-bottom:5px}.sub{color:#666}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}.box{border:1px solid #ddd;border-radius:10px;padding:12px}.box b{display:block;font-size:20px}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border:1px solid #ddd;padding:8px;font-size:12px;text-align:left}th{background:#f1edff}</style>
+</head><body>
+ <h1>Aura Agency - Arşivlenmiş Haftalık Rapor</h1>
+ <div class="sub">${a.cycleNumber}. Hafta Döngüsü • ${new Date(a.startedAt).toLocaleString("tr-TR")} - ${new Date(a.closedAt).toLocaleString("tr-TR")}</div>
+ <p><b>Asistan:</b> ${esc(a.assistantName||"-")} &nbsp; <b>Telefon:</b> ${esc(a.assistantPhone||"-")}</p>
+ <div class="summary"><div class="box"><b>${a.hostCount}</b>Yayıncı</div><div class="box"><b>${num(a.quota)}</b>Toplam kota</div><div class="box"><b>${usd(a.totalUsd)}</b>Kazanç</div><div class="box"><b>${a.penalty} AZN</b>Ceza</div></div>
+ <p><b>Reklam:</b> ${a.adCount}/2</p>
+ <h2>Yayıncı Listesi</h2><table><thead><tr><th>#</th><th>İsim</th><th>SOYO ID</th><th>Telefon</th><th>Kota</th><th>Durum</th></tr></thead><tbody>${rows}</tbody></table>
+ <script>window.onload=()=>setTimeout(()=>window.print(),300)<\/script></body></html>`;
+}
+
+function openArchiveReport(key){
+ const a=(data.archives||[]).find(x=>x.key===key);
+ if(!a)return;
+ const w=window.open("","_blank");
+ if(!w){showToast("Açılır pencereye izin ver.");return}
+ w.document.open();w.document.write(archiveReportHtml(a));w.document.close();
+}
+
+function deleteArchive(key){
+ if(!confirm("Bu eski rapor arşivden silinsin mi?"))return;
+ data.archives=(data.archives||[]).filter(a=>a.key!==key);
+ persist();
+ showToast("Eski rapor silindi.");
+}
+
+function saveSettingsProfile(){
+ data.profile.name=document.getElementById("settingsAssistantName").value.trim();
+ data.profile.phone=document.getElementById("settingsAssistantPhone").value.trim();
+ persist();
+ showToast("Bilgiler güncellendi.");
+}
+
+function deleteCurrentWeekReport(){
+ const w=cycleInfo();
+ if(!confirm("Bu döngünün rapor verileri silinsin mi?"))return;
+ if(data.calculations) delete data.calculations[w.key];
+ if(data.ads) delete data.ads[w.key];
+ data.documents=data.documents.filter(d=>(d.cycleId||"cycle-1")!==w.key);
+ localStorage.setItem(KEY,JSON.stringify(data));
+ clearQuotaCalculator();
+ updateUI();
+ showToast("Bu döngünün rapor verileri silindi.");
+}
+
+function resetAllData(){
+ if(!confirm("Tüm veriler kalıcı olarak silinecek. Emin misin?"))return;
+ if(!confirm("Son kez onayla: yayıncılar, notlar ve raporlar tamamen silinsin mi?"))return;
+ localStorage.removeItem(KEY);
+ data=defaultData();
+ clearQuotaCalculator();
+ updateUI();
+ switchTab("home");
+ showToast("Tüm veriler sıfırlandı.");
+}
+
+
+function longReportHtml(){
+ const r=calculate(),docs=currentWeekDocs(),name=data.profile.name||"Belirtilmedi",phone=data.profile.phone||"Belirtilmedi";
+ const hostRows=r.hosts.map((h,i)=>`
+   <div style="display:grid;grid-template-columns:40px 1.4fr 1fr 1fr 1fr;gap:8px;padding:10px 0;border-bottom:1px solid #e5e5e5;font-size:13px">
+    <div>${i+1}</div><div><b>${esc(h.name)}</b><br><span style="color:#666">${esc(h.phone)}</span></div>
+    <div>${esc(h.soyoId)}</div><div>${num(h.quota)} 💎</div><div>${esc(h.status)}</div>
+   </div>`).join("")||'<div style="padding:18px;text-align:center;color:#777">Yayıncı kaydı yok.</div>';
+
+ const docRows=docs.map(d=>`
+   <div style="padding:10px 0;border-bottom:1px solid #e5e5e5">
+    <b>${esc(d.name)}</b><br><span style="color:#666;font-size:12px">${esc(d.description||"-")} • ${fmtDateTime(d.createdAt)}</span>
+   </div>`).join("")||'<div style="padding:18px;text-align:center;color:#777">Belge kaydı yok.</div>';
+
+ return `
+ <div style="width:900px;background:#fff;color:#222;padding:36px;font-family:Arial,sans-serif">
+  <div style="background:linear-gradient(135deg,#6e42d9,#9f6cff);color:white;padding:28px;border-radius:22px">
+   <div style="font-size:30px;font-weight:800">Aura Agency</div>
+   <div style="font-size:18px;margin-top:6px">Haftalık Asistan Raporu</div>
+   <div style="opacity:.9;margin-top:10px">${r.w.label}</div>
+  </div>
+
+  <div style="margin-top:22px;padding:16px;border:1px solid #eee;border-radius:16px">
+   <b>Asistan:</b> ${esc(name)} &nbsp;&nbsp; <b>Telefon:</b> ${esc(phone)}
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0">
+   <div style="border:1px solid #ddd;border-radius:14px;padding:15px"><div style="font-size:24px;font-weight:800">${r.count}</div><div style="color:#666">Yayıncı</div></div>
+   <div style="border:1px solid #ddd;border-radius:14px;padding:15px"><div style="font-size:24px;font-weight:800">${num(r.quota)}</div><div style="color:#666">Toplam Kota</div></div>
+   <div style="border:1px solid #ddd;border-radius:14px;padding:15px"><div style="font-size:24px;font-weight:800">${usd(r.totalUsd)}</div><div style="color:#666">Toplam Kazanç</div></div>
+   <div style="border:1px solid #ddd;border-radius:14px;padding:15px"><div style="font-size:24px;font-weight:800">${r.penalty} AZN</div><div style="color:#666">Ceza</div></div>
+  </div>
+
+  <div style="padding:16px;border-radius:14px;background:${r.penalty?'#fff0f3':'#ecfff8'};border:1px solid ${r.penalty?'#ffb3c1':'#9be8cc'}">
+   <b>Durum:</b> Minimum 40.000.000 • Maksimum 100.000.000 • Mevcut ${num(r.quota)} • Reklam ${r.adCount}/2
+  </div>
+
+  <h2 style="margin-top:28px">Yayıncı Listesi</h2>
+  <div style="display:grid;grid-template-columns:40px 1.4fr 1fr 1fr 1fr;gap:8px;padding:10px 0;border-bottom:2px solid #222;font-weight:800;font-size:13px">
+   <div>#</div><div>Yayıncı</div><div>SOYO ID</div><div>Kota</div><div>Durum</div>
+  </div>
+  ${hostRows}
+
+  <h2 style="margin-top:28px">Reklam Kayıtları</h2>
+  <div style="padding:14px;border:1px solid #eee;border-radius:14px">
+   1. Reklam: ${r.ads.ad1?fmtDateTime(r.ads.ad1):"Yapılmadı"}<br><br>
+   2. Reklam: ${r.ads.ad2?fmtDateTime(r.ads.ad2):"Yapılmadı"}
+  </div>
+
+  <h2 style="margin-top:28px">Belgeler</h2>
+  <div style="border:1px solid #eee;border-radius:14px;padding:0 14px">${docRows}</div>
+
+  <div style="margin-top:28px;text-align:center;color:#777;font-size:12px">
+   Rapor zamanı: ${new Date().toLocaleString("tr-TR")}
+  </div>
+ </div>`;
+}
+
+async function downloadLongReportImage(){
+ if(typeof html2canvas==="undefined"){
+   showToast("Fotoğraf özelliği yüklenemedi. İnternet bağlantısını kontrol et.");
+   return;
+ }
+
+ const wrapper=document.createElement("div");
+ wrapper.style.position="fixed";
+ wrapper.style.left="-10000px";
+ wrapper.style.top="0";
+ wrapper.innerHTML=longReportHtml();
+ document.body.appendChild(wrapper);
+
+ try{
+   const target=wrapper.firstElementChild;
+   const canvas=await html2canvas(target,{
+     scale:2,
+     backgroundColor:"#ffffff",
+     useCORS:true,
+     logging:false,
+     windowWidth:900
+   });
+   const link=document.createElement("a");
+   link.download=`Aura-Agency-Uzun-Rapor-${cycleInfo().key}.png`;
+   link.href=canvas.toDataURL("image/png",1.0);
+   document.body.appendChild(link);
+   link.click();
+   link.remove();
+   showToast("Uzun rapor fotoğrafı indirildi.");
+ }catch(e){
+   showToast("Fotoğraf oluşturulamadı.");
+ }finally{
+   wrapper.remove();
+ }
+}
+
+function updateClock(){const n=new Date();document.getElementById("liveTime").textContent=n.toLocaleTimeString("tr-TR");document.getElementById("liveDate").textContent=n.toLocaleDateString("tr-TR",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}
+
+function renderHostCardCalculation(){
+ const el=document.getElementById("hostCardCalculation");
+ if(!el)return;
+ const saved=currentCalculation();
+ if(!saved || saved.source!=="host_cards"){
+   el.className="alert warning";
+   el.textContent="Kartlardaki kotalar henüz hesaplanmadı.";
+   return;
+ }
+ el.className="alert "+(saved.total>=100000000?"success":saved.total>=40000000?"warning":"danger");
+ el.innerHTML=`<b>${saved.values?.length||0} yayıncı kartı hesaplandı.</b><br>
+ Toplam kota: <b>${num(saved.total)} 💎</b><br>
+ Toplam kazanç: <b>${usd(saved.usd)}</b><br>
+ Son kayıt: ${fmtDateTime(saved.savedAt)}`;
+}
+
+function updateUI(){
+ document.getElementById("assistantName").value=data.profile.name||"";
+ document.getElementById("assistantPhone").value=data.profile.phone||"";
+ document.getElementById("settingsAssistantName").value=data.profile.name||"";
+ document.getElementById("settingsAssistantPhone").value=data.profile.phone||"";
+ renderHosts();renderNotes();renderDocuments();renderHostCardCalculation();renderArchives();updateDashboard()
+}
+setInterval(updateClock,1000);updateClock();updateUI();
+</script>
+</body>
+</html>
