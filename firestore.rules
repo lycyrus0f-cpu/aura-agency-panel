@@ -1,0 +1,110 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function me() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function role() {
+      return signedIn() ? me().data.role : null;
+    }
+
+    function isAdmin() {
+      return role() == 'admin';
+    }
+
+    function isCeo() {
+      return role() == 'ceo';
+    }
+
+    function hasPermission(key) {
+      return isAdmin() || (isCeo() && me().data.permissions[key] == true);
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin() || isCeo());
+      allow create: if isAdmin() || hasPermission('manageUsers');
+      allow update: if isAdmin()
+        || (hasPermission('manageUsers') && resource.data.role != 'admin' && request.resource.data.role != 'admin')
+        || (request.auth.uid == uid
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.permissions == resource.data.permissions);
+      allow delete: if isAdmin() || (hasPermission('manageUsers') && resource.data.role != 'admin');
+    }
+
+    match /assistants/{assistantId} {
+      allow read: if signedIn() && (request.auth.uid == assistantId || isAdmin() || isCeo());
+      allow write: if signedIn() && (request.auth.uid == assistantId || isAdmin() || hasPermission('manageAssistants'));
+    }
+
+    match /hosts/{hostId} {
+      allow read: if signedIn() && (resource.data.ownerUid == request.auth.uid || isAdmin() || isCeo());
+      allow create: if signedIn() && (request.resource.data.ownerUid == request.auth.uid || isAdmin() || hasPermission('manageHosts'));
+      allow update, delete: if signedIn() && (resource.data.ownerUid == request.auth.uid || isAdmin() || hasPermission('manageHosts'));
+    }
+
+    match /notes/{noteId} {
+      allow read: if signedIn() && (resource.data.ownerUid == request.auth.uid || isAdmin() || isCeo());
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow update, delete: if signedIn() && (resource.data.ownerUid == request.auth.uid || isAdmin() || hasPermission('manageNotes'));
+    }
+
+    match /cycles/{cycleId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin() || hasPermission('resetCycle');
+    }
+
+    match /reports/{reportId} {
+      allow read: if signedIn() && (resource.data.ownerUid == request.auth.uid || isAdmin() || isCeo());
+      allow create: if signedIn();
+      allow update, delete: if isAdmin() || hasPermission('manageReports');
+    }
+
+    match /penalties/{penaltyId} {
+      allow read: if signedIn() && (resource.data.assistantUid == request.auth.uid || isAdmin() || isCeo());
+      allow create: if isAdmin() || hasPermission('managePenalties');
+      allow update, delete: if isAdmin() || hasPermission('managePenalties');
+    }
+
+    match /settings/{settingId} {
+      allow read: if signedIn();
+      allow write: if isAdmin() || hasPermission('manageSettings');
+    }
+
+    match /workEnd/{entryId} {
+      allow read: if signedIn() && (resource.data.assistantUid == request.auth.uid || isAdmin() || isCeo());
+      allow create: if signedIn() && request.resource.data.assistantUid == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    match /salary/{salaryId} {
+      allow read: if signedIn() && (resource.data.assistantUid == request.auth.uid || isAdmin() || isCeo());
+      allow create, update, delete: if isAdmin() || hasPermission('manageSalary');
+    }
+
+    match /chats/{chatId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.memberUids;
+      allow create: if signedIn() && request.auth.uid in request.resource.data.memberUids;
+      allow update: if signedIn() && request.auth.uid in resource.data.memberUids;
+      allow delete: if isAdmin() || hasPermission('manageChat');
+
+      match /messages/{messageId} {
+        allow read: if signedIn() && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.memberUids;
+        allow create: if signedIn()
+          && request.resource.data.senderUid == request.auth.uid
+          && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.memberUids;
+        allow update, delete: if isAdmin() || hasPermission('manageChat') || resource.data.senderUid == request.auth.uid;
+      }
+    }
+
+    match /activityLogs/{logId} {
+      allow read: if isAdmin() || isCeo();
+      allow create: if signedIn();
+      allow update, delete: if false;
+    }
+  }
+}
