@@ -70,6 +70,10 @@ service cloud.firestore {
       allow update, delete: if isAdmin() || hasPermission('managePenalties');
     }
 
+    match /penaltySuggestions/{suggestionId} {
+      allow read, create, update, delete: if isAdmin() || hasPermission('managePenalties');
+    }
+
     match /settings/{settingId} {
       allow read: if signedIn();
       allow write: if isAdmin() || hasPermission('manageSettings');
@@ -123,10 +127,20 @@ service cloud.firestore {
       }
     }
 
+    match /auditLogs/{logId} {
+      allow read: if isAdmin() || isCeo();
+      allow create: if signedIn();
+      allow update, delete: if false;
+    }
+
     match /activityLogs/{logId} {
       allow read: if isAdmin() || isCeo();
       allow create: if signedIn();
       allow update, delete: if false;
+    }
+
+    match /trash/{trashId} {
+      allow read, create, update, delete: if isAdmin() || isCeo();
     }
   }
 }
