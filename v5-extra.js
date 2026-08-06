@@ -21,3 +21,5 @@ async function v5ImportCsv(){const f=document.getElementById('v5Csv').files[0];i
 const _v5OldPenalty=addPenalty;addPenalty=async function(){await _v5OldPenalty();v5Log('Manuel ceza','Ceza yönetiminden işlem')};
 const _v5OldHost=addHost;addHost=async function(){const name=document.getElementById('hName').value.trim();await _v5OldHost();if(name)v5Log('Yayıncı eklendi',name)};
 setInterval(()=>{if(isManager()){v5ShowManagers();v5Render()}},3000);
+/* load hotfixes after V5 is ready */
+(()=>{const s=document.createElement('script');s.src='v5-fixes.js?v=5.1.1';s.defer=true;document.head.appendChild(s)})();
