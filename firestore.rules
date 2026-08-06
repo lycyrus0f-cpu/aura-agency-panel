@@ -66,8 +66,7 @@ service cloud.firestore {
 
     match /penalties/{penaltyId} {
       allow read: if signedIn() && (resource.data.assistantUid == request.auth.uid || isAdmin() || isCeo());
-      allow create: if isAdmin() || hasPermission('managePenalties');
-      allow update, delete: if isAdmin() || hasPermission('managePenalties');
+      allow create, update, delete: if isAdmin() || hasPermission('managePenalties');
     }
 
     match /penaltySuggestions/{suggestionId} {
@@ -113,17 +112,28 @@ service cloud.firestore {
     }
 
     match /chats/{chatId} {
-      allow read: if signedIn() && request.auth.uid in resource.data.memberUids;
-      allow create: if signedIn() && request.auth.uid in request.resource.data.memberUids;
-      allow update: if signedIn() && request.auth.uid in resource.data.memberUids;
+      // General chat is shared by every signed-in panel user.
+      allow read: if signedIn() && (chatId == 'general' || request.auth.uid in resource.data.memberUids);
+      allow create: if signedIn() && (chatId == 'general' || request.auth.uid in request.resource.data.memberUids);
+      allow update: if signedIn() && (chatId == 'general' || request.auth.uid in resource.data.memberUids);
       allow delete: if isAdmin() || hasPermission('manageChat');
 
       match /messages/{messageId} {
-        allow read: if signedIn() && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.memberUids;
+        allow read: if signedIn() && (
+          chatId == 'general'
+          || request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.memberUids
+        );
         allow create: if signedIn()
           && request.resource.data.senderUid == request.auth.uid
-          && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.memberUids;
-        allow update, delete: if isAdmin() || hasPermission('manageChat') || resource.data.senderUid == request.auth.uid;
+          && (
+            chatId == 'general'
+            || request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.memberUids
+          );
+        allow update, delete: if signedIn() && (
+          isAdmin()
+          || hasPermission('manageChat')
+          || resource.data.senderUid == request.auth.uid
+        );
       }
     }
 
