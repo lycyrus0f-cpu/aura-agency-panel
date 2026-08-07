@@ -23,7 +23,7 @@ window.addEventListener('load', () => {
     if (document.getElementById('aura-v6-private-fix-loader')) return;
     const s = document.createElement('script');
     s.id = 'aura-v6-private-fix-loader';
-    s.src = 'v6-private-fix.js?v=6.0.1';
+    s.src = 'v6-private-fix.js?v=6.0.5';
     document.body.appendChild(s);
   }, 2600);
 
@@ -50,4 +50,12 @@ window.addEventListener('load', () => {
     s.src = 'v6-delete-assistant.js?v=6.0.4';
     document.body.appendChild(s);
   }, 4400);
+
+  setTimeout(() => {
+    if (document.getElementById('aura-v6-critical-fix-loader')) return;
+    const s = document.createElement('script');
+    s.id = 'aura-v6-critical-fix-loader';
+    s.src = 'v6-critical-fix.js?v=6.0.6';
+    document.body.appendChild(s);
+  }, 5000);
 });
