@@ -42,4 +42,12 @@ window.addEventListener('load', () => {
     s.src = 'v6-login-history.js?v=6.0.3';
     document.body.appendChild(s);
   }, 3800);
+
+  setTimeout(() => {
+    if (document.getElementById('aura-v6-delete-assistant-loader')) return;
+    const s = document.createElement('script');
+    s.id = 'aura-v6-delete-assistant-loader';
+    s.src = 'v6-delete-assistant.js?v=6.0.4';
+    document.body.appendChild(s);
+  }, 4400);
 });
