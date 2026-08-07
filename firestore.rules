@@ -84,6 +84,21 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    match /leaveRequests/{leaveId} {
+      allow read: if signedIn() && (resource.data.assistantUid == request.auth.uid || isAdmin() || isCeo());
+      allow create: if signedIn()
+        && request.resource.data.assistantUid == request.auth.uid
+        && request.resource.data.status == 'pending';
+      allow update: if isAdmin() || hasPermission('managePenalties')
+        || (signedIn()
+          && resource.data.assistantUid == request.auth.uid
+          && request.resource.data.assistantUid == request.auth.uid
+          && resource.data.status == 'pending'
+          && request.resource.data.status == 'pending');
+      allow delete: if isAdmin() || hasPermission('managePenalties')
+        || (signedIn() && resource.data.assistantUid == request.auth.uid && resource.data.status == 'pending');
+    }
+
     match /salary/{salaryId} {
       allow read: if signedIn() && (resource.data.assistantUid == request.auth.uid || isAdmin() || isCeo());
       allow create, update, delete: if isAdmin() || hasPermission('manageSalary');
@@ -136,14 +151,12 @@ service cloud.firestore {
       }
     }
 
-    // V6 live online / last-seen state.
     match /presence/{uid} {
       allow read: if signedIn();
       allow create, update: if signedIn() && (request.auth.uid == uid || isAdmin());
       allow delete: if signedIn() && (request.auth.uid == uid || isAdmin());
     }
 
-    // V6 WebRTC call signaling and call history.
     match /calls/{callId} {
       allow read: if signedIn() && (
         isAdmin()
