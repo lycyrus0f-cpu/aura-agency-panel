@@ -58,4 +58,12 @@ window.addEventListener('load', () => {
     s.src = 'v6-critical-fix.js?v=6.0.6';
     document.body.appendChild(s);
   }, 5000);
+
+  setTimeout(() => {
+    if (document.getElementById('aura-host-tools-loader')) return;
+    const s = document.createElement('script');
+    s.id = 'aura-host-tools-loader';
+    s.src = 'host-tools.js?v=1.0.1';
+    document.body.appendChild(s);
+  }, 5600);
 });
