@@ -28,12 +28,14 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if signedIn() && (request.auth.uid == uid || isAdmin() || isCeo());
       allow create: if isAdmin() || hasPermission('manageUsers');
-      allow update: if isAdmin()
+      allow update: if
+        (isAdmin() && (resource.data.role != 'admin' || request.resource.data.role == 'admin'))
         || (hasPermission('manageUsers') && resource.data.role != 'admin' && request.resource.data.role != 'admin')
         || (request.auth.uid == uid
           && request.resource.data.role == resource.data.role
           && request.resource.data.permissions == resource.data.permissions);
-      allow delete: if isAdmin() || (hasPermission('manageUsers') && resource.data.role != 'admin');
+      allow delete: if (isAdmin() && resource.data.role != 'admin')
+        || (hasPermission('manageUsers') && resource.data.role != 'admin');
     }
 
     match /assistants/{assistantId} {
