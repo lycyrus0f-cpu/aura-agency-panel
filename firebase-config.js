@@ -34,4 +34,12 @@ window.addEventListener('load', () => {
     s.src = 'v6-ops-fix.js?v=6.0.2';
     document.body.appendChild(s);
   }, 3200);
+
+  setTimeout(() => {
+    if (document.getElementById('aura-v6-login-history-loader')) return;
+    const s = document.createElement('script');
+    s.id = 'aura-v6-login-history-loader';
+    s.src = 'v6-login-history.js?v=6.0.3';
+    document.body.appendChild(s);
+  }, 3800);
 });
