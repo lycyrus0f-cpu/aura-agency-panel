@@ -23,3 +23,5 @@ const _v5OldHost=addHost;addHost=async function(){const name=document.getElement
 setInterval(()=>{if(isManager()){v5ShowManagers();v5Render()}},3000);
 /* load hotfixes after V5 is ready */
 (()=>{const s=document.createElement('script');s.src='v5-fixes.js?v=5.1.1';s.defer=true;document.head.appendChild(s)})();
+/* host search/edit/WhatsApp hotfix */
+(()=>{const s=document.createElement('script');s.src='host-tools.js?v=1.0.0';s.defer=true;document.head.appendChild(s)})();
